@@ -1,8 +1,14 @@
 package com.bn.appium.tests.manager;
 
 import com.bn.appium.tests.utils.*;
+import io.appium.java_client.AppiumDriver;
 import net.bugs.testhelper.TestHelper;
 import net.bugs.testhelper.view.View;
+import org.apache.commons.io.FileUtils;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.remote.Augmenter;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -33,8 +39,10 @@ public class TestManager {
     private static long mEndTime = 0;
     private static boolean mTestResult = false;
     public static ConfigManager configManager = null;
+    private static AppiumDriver driver;
 
-    private TestManager(String buildID, String deviceID) {
+    private TestManager(String buildID, String deviceID, AppiumDriver appiumDriver) {
+        driver = appiumDriver;
         configManager = new ConfigManager();
         testHelper = new TestHelper(deviceID);
         mDevice = new Device(testHelper, buildID);
@@ -46,7 +54,7 @@ public class TestManager {
     }
 
     public static TestManager getInstance(final String buildId, final String login, final String password,
-                                          final String deviceId, final String hwDevice, final String timeout){
+                                          final String deviceId, final String hwDevice, final String timeout, AppiumDriver driver){
         mArgTimeout = timeout;
         mDeviceId = deviceId;
         mHwDevice = hwDevice;
@@ -56,13 +64,13 @@ public class TestManager {
         if(instance == null)
             synchronized (TestManager.class){
                 if(instance == null)
-                    instance = new TestManager(mBuildId, mDeviceId);
+                    instance = new TestManager(mBuildId, mDeviceId, driver);
             }
         return instance;
     }
 
-    public static TestManager getInstance(){
-        return getInstance(mBuildId, mLogin, mPassword, mDeviceId, mHwDevice, mArgTimeout);
+    public static TestManager getInstance(AppiumDriver driver){
+        return getInstance(mBuildId, mLogin, mPassword, mDeviceId, mHwDevice, mArgTimeout, driver);
     }
 
     public static void stopApplication(String $package){
@@ -183,6 +191,20 @@ public class TestManager {
 
     public void stopErrorHandler() {
         isStopErrorHandler = true;
+    }
+
+
+    public static void captureScreenshot(String testName) {
+        new File("target/surefire-reports/screenshot/").mkdirs();
+        String filename = "target/surefire-reports/screenshot/" + testName + ".jpg";
+
+        try {
+            WebDriver augmentedDriver = new Augmenter().augment(driver);
+            File scrFile = ((TakesScreenshot)augmentedDriver).getScreenshotAs(OutputType.FILE);
+            FileUtils.copyFile(scrFile, new File(filename), true);
+        } catch (Exception e) {
+            System.out.println("Error capturing screen shot of " + testName + " test failure.");
+        }
     }
 
     public static class Errors {

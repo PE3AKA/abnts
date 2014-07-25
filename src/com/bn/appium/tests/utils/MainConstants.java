@@ -6,7 +6,7 @@ package com.bn.appium.tests.utils;
 public class MainConstants {
     public static final String CONFIGURATION_FILE_PATH = "config.properties";
     public static int DEFAULT_TIMEOUT = 5000;
-    public static final String FILE_NAME_LOG_TESTS = "android.csv";
+    public static String FILE_NAME_LOG_TESTS = "android.csv";
     public static final String TIME_FORMAT = "hh_mm_ss_SSS__dd_MM_yyyy_";
     public static final String PATH_TO_SCREENSHOTS = "Screenshots";
     public static final String PATH_TO_ITEMS_NAME = "";

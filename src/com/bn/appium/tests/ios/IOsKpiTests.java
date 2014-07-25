@@ -1,32 +1,34 @@
 package com.bn.appium.tests.ios;
 
+import com.bn.appium.tests.android.AndroidKpiTests;
+import com.bn.appium.tests.manager.TestManager;
 import com.bn.appium.tests.utils.ConfigManager;
 import com.bn.appium.tests.utils.ConfigurationParametersEnum;
+import com.bn.appium.tests.utils.MainConstants;
+import com.bn.appium.tests.utils.Timer;
 import io.appium.java_client.AppiumDriver;
-import io.appium.java_client.MobileElement;
-import org.openqa.selenium.Dimension;
-import org.openqa.selenium.Point;
-import org.openqa.selenium.WebElement;
+import net.bugs.testhelper.TestHelper;
+import org.openqa.selenium.*;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.remote.RemoteWebElement;
 
-import java.io.File;
+import java.io.*;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class IOsKpiTests {
     private AppiumDriver driver;
     private WebElement row;
     private ConfigManager configManager;
+    private Process process;
+    private TestManager testManager;
+    private TestHelper testHelper;
 
     public void setUp() throws Exception {
         configManager = new ConfigManager();
-        File classpathRoot = new File(System.getProperty("user.dir"));
-//        File appDir = new File(classpathRoot, "../../../apps/UICatalog/build/Release-iphonesimulator");
-//        File appDir = new File(classpathRoot, "../../../apps/WebViewApp/build/Release-iphonesimulator");
-//        File app = new File(appDir, "WebViewApp.app");
-//        File app = new File(appDir, "UICatalog.app");
+        launchServer();
+        Thread.sleep(5000);
         DesiredCapabilities capabilities = new DesiredCapabilities();
         capabilities.setCapability(CapabilityType.BROWSER_NAME, "");
         capabilities.setCapability("platformVersion", configManager.getProperty(ConfigurationParametersEnum.IOS_PLATFORM_VERSION.name()));
@@ -35,30 +37,91 @@ public class IOsKpiTests {
         capabilities.setCapability("U", configManager.getProperty(ConfigurationParametersEnum.IOS_DEVICE_ID.name()));
         capabilities.setCapability("app", configManager.getProperty(ConfigurationParametersEnum.IOS_APP_PACKAGE.name()));
         driver = new AppiumDriver(new URL("http://127.0.0.1:4723/wd/hub"), capabilities);
+        MainConstants.TIME_START_TEST = System.currentTimeMillis();
+        MainConstants.FILE_NAME_LOG_TESTS = "iOs.csv";
+        testManager = TestManager.getInstance(driver);
+        testHelper = testManager.getTestHelper();
+    }
+
+    private void launchServer() {
+        new Thread(new Runnable() {
+            public void run() {
+                String[] commands = new String[]{
+                        "appium",
+                        "-U",
+                        configManager.getProperty(ConfigurationParametersEnum.IOS_DEVICE_ID.name())
+                };
+
+                try {
+                    process = Runtime.getRuntime().exec(commands);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 
     public void tearDown() throws Exception {
         driver.quit();
-    }
-
-    private void openMenuPosition(int index) {
-        //populate text fields with two random number
-        MobileElement table = new MobileElement((RemoteWebElement)driver.findElementByClassName("UIATableView"), driver);
-        row = table.findElementsByClassName("UIATableCell").get(index);
-        row.click();
+        if(process != null)
+            process.destroy();
     }
 
     private Point getCenter(WebElement element) {
 
-      Point upperLeft = element.getLocation();
-      Dimension dimensions = element.getSize();
-      return new Point(upperLeft.getX() + dimensions.getWidth()/2, upperLeft.getY() + dimensions.getHeight()/2);
+        Point upperLeft = element.getLocation();
+        Dimension dimensions = element.getSize();
+        return new Point(upperLeft.getX() + dimensions.getWidth()/2, upperLeft.getY() + dimensions.getHeight()/2);
     }
 
-    public void testFindElement() throws Exception {
+    private WebElement getWebElement(By by){
+        WebElement webElement = null;
+        try {
+            webElement = driver.findElement(by);
+        } catch (Exception ex) {
+            webElement = null;
+        }
+        return webElement;
+    }
+
+    private void sleep(long ms){
+        try {
+            Thread.sleep(ms);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void logOut() {
+        WebElement webElement;
+        webElement = getWebElement(By.name("com.bn hub hamburger menu"));
+        if(webElement == null)  return;
+        webElement.click();
+        sleep(2000);
+
+        webElement = getWebElement(By.name("SETTINGS"));
+        webElement.click();
+        sleep(2000);
+
+        webElement = getWebElement(By.name("Logout"));
+        webElement.click();
+        sleep(2000);
+
+        webElement = getWebElement(By.name("OK"));
+        webElement.click();
+
+        WebElement signInButton = getWebElement(By.name("signIn"));
+        while (signInButton == null) {
+            sleep(1000);
+            signInButton = getWebElement(By.name("signIn"));
+        }
+    }
+
+    public void login() throws Exception {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss:SSS");
         System.out.println(simpleDateFormat.format(System.currentTimeMillis()) + " start test");
-        MobileElement signInButton = new MobileElement((RemoteWebElement)driver.findElementByName("signIn"), driver);
+        WebElement signInButton = getWebElement(By.name("signIn"));
+        if(signInButton == null) return;
 
         if(signInButton.isDisplayed()) {
             System.out.println(simpleDateFormat.format(System.currentTimeMillis()) + " Click");
@@ -66,25 +129,33 @@ public class IOsKpiTests {
         }
         Thread.sleep(2000);
 
-        WebElement editText = driver.findElementByClassName("UIATextField");
+        WebElement editText = getWebElement(By.className("UIATextField"));
         editText.sendKeys("8494076_qa@books.com");
 
-        WebElement secureEditText = driver.findElementByClassName("UIASecureTextField");
+        WebElement secureEditText = getWebElement(By.className("UIASecureTextField"));
         secureEditText.sendKeys("access\n");
 
-//        WebElement signIn = driver.findElementByName("Sign in");
-//
-//        if(signIn.isDisplayed()) {
-//            System.out.println(simpleDateFormat.format(System.currentTimeMillis()) + " click sign in");
-//            signIn.click();
-//        }
+        TestManager.startTimer();
 
+        WebElement webElement = getWebElement(By.name("Free Sample"));
+
+        while (true) {
+            if(Timer.getTimeout() <= 0) {
+                TestManager.write(TestManager.addLogParams(new Date(), MainConstants.Android.Kpi.TestAction.SIGN_IN, AndroidKpiTests.Constant.Account.ACCOUNT, false));
+                return;
+            }
+            if(webElement != null) {
+                TestManager.stopTimer(false);
+                TestManager.write(TestManager.addLogParams(new Date(), MainConstants.Android.Kpi.TestAction.SIGN_IN, AndroidKpiTests.Constant.Account.ACCOUNT, true));
+                break;
+            }
+            webElement = getWebElement(By.name("Free Sample"));
+        }
 
         Thread.sleep(2000);
 
-        WebElement webElement = null;
         try {
-            webElement = driver.findElementByName("Network connection in progress");
+            webElement = getWebElement(By.name("Network connection in progress"));
         } catch (Exception ex) {
             webElement = null;
         }
@@ -92,7 +163,7 @@ public class IOsKpiTests {
         while (webElement != null) {
             System.out.println(simpleDateFormat.format(System.currentTimeMillis()) + " wait for signed in");
             try {
-                webElement = driver.findElementByName("Network connection in progress");
+                webElement = getWebElement(By.name("Network connection in progress"));
             } catch (Exception ex) {
                 webElement = null;
             }

@@ -1,6 +1,13 @@
 package com.bn.appium.tests.utils;
 
+import com.bn.appium.tests.manager.TestManager;
+import io.appium.java_client.AppiumDriver;
 import net.bugs.testhelper.TestHelper;
+import org.apache.commons.io.FileUtils;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.remote.Augmenter;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
@@ -56,7 +63,7 @@ public class FileWorker {
         String name = itemLog.getDate() + "_" + itemLog.getTime() + "_" + (itemLog.getTestResult() ? "pass" : "fail") +
                 "_" + itemLog.getTestName() + "_" + itemLog.getTestAction();
         testHelper.sleep(MainConstants.SCREENSHOT_TIMEOUT);
-        testHelper.takeScreenshot(name, "screenshots");
+        TestManager.captureScreenshot(name);
     }
 
     public Date write (String text) {

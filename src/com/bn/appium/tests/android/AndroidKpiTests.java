@@ -26,8 +26,6 @@ public class AndroidKpiTests {
 
     public void setUp() throws Exception {
         System.out.println("setUp");
-        testManager = TestManager.getInstance();
-        testHelper = testManager.getTestHelper();
         configManager = new ConfigManager();
         File appDir = new File(configManager.getProperty(ConfigurationParametersEnum.ANDROID_APP_DIR.name()));
         File app = new File(appDir, configManager.getProperty(ConfigurationParametersEnum.ANDROID_APP.name()));
@@ -40,6 +38,8 @@ public class AndroidKpiTests {
         capabilities.setCapability("appPackage", configManager.getProperty(ConfigurationParametersEnum.ANDROID_APP_PACKAGE.name()));
         capabilities.setCapability("appActivity", configManager.getProperty(ConfigurationParametersEnum.ANDROID_APP_ACTIVITY.name()));
         driver = new AppiumDriver(new URL("http://127.0.0.1:4723/wd/hub"), capabilities);
+        testManager = TestManager.getInstance(driver);
+        testHelper = testManager.getTestHelper();
     }
 
     public void tearDown() throws Exception {
