@@ -1,5 +1,7 @@
 package com.bn.appium.tests.ios;
 
+import com.bn.appium.tests.utils.ConfigManager;
+import com.bn.appium.tests.utils.ConfigurationParametersEnum;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.MobileElement;
 import org.openqa.selenium.Dimension;
@@ -13,39 +15,13 @@ import java.io.File;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 
-
-/**
- * <a href="https://github.com/appium/appium">Appium</a> test which runs against a local Appium instance deployed
-  * with the 'UICatalog' iPhone project which is included in the Appium source distribution.
- *
- * @author Ross Rowe
- */
 public class UICatalogTest {
-
-    private static AppiumDriver driver;
-
+    private AppiumDriver driver;
     private WebElement row;
+    private ConfigManager configManager;
 
-    public static void main(String[] args){
-        try {
-            setUp();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        try {
-            testFindElement();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        try {
-            tearDown();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static void setUp() throws Exception {
-        // set up appium
+    public void setUp() throws Exception {
+        configManager = new ConfigManager();
         File classpathRoot = new File(System.getProperty("user.dir"));
 //        File appDir = new File(classpathRoot, "../../../apps/UICatalog/build/Release-iphonesimulator");
 //        File appDir = new File(classpathRoot, "../../../apps/WebViewApp/build/Release-iphonesimulator");
@@ -53,16 +29,15 @@ public class UICatalogTest {
 //        File app = new File(appDir, "UICatalog.app");
         DesiredCapabilities capabilities = new DesiredCapabilities();
         capabilities.setCapability(CapabilityType.BROWSER_NAME, "");
-        capabilities.setCapability("platformVersion", "7.1.2");
-        capabilities.setCapability("platformName", "iOS");
-        capabilities.setCapability("deviceName", "87fcb473c35ef455aefb93db35ec904c12086da9");
-        capabilities.setCapability("U", "87fcb473c35ef455aefb93db35ec904c12086da9");
-        capabilities.setCapability("app", "com.barnesandnoble.B-N-eReader");
-
+        capabilities.setCapability("platformVersion", configManager.getProperty(ConfigurationParametersEnum.IOS_PLATFORM_VERSION.name()));
+        capabilities.setCapability("platformName", configManager.getProperty(ConfigurationParametersEnum.IOS_PLATFORM_NAME.name()));
+        capabilities.setCapability("deviceName", configManager.getProperty(ConfigurationParametersEnum.IOS_DEVICE_ID.name()));
+        capabilities.setCapability("U", configManager.getProperty(ConfigurationParametersEnum.IOS_DEVICE_ID.name()));
+        capabilities.setCapability("app", configManager.getProperty(ConfigurationParametersEnum.IOS_APP_PACKAGE.name()));
         driver = new AppiumDriver(new URL("http://127.0.0.1:4723/wd/hub"), capabilities);
     }
 
-    public static void tearDown() throws Exception {
+    public void tearDown() throws Exception {
         driver.quit();
     }
 
@@ -80,7 +55,7 @@ public class UICatalogTest {
       return new Point(upperLeft.getX() + dimensions.getWidth()/2, upperLeft.getY() + dimensions.getHeight()/2);
     }
 
-    public static void testFindElement() throws Exception {
+    public void testFindElement() throws Exception {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss:SSS");
         System.out.println(simpleDateFormat.format(System.currentTimeMillis()) + " start test");
         MobileElement signInButton = new MobileElement((RemoteWebElement)driver.findElementByName("signIn"), driver);
