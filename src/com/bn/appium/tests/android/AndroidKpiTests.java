@@ -1,23 +1,33 @@
 package com.bn.appium.tests.android;
 
+import com.bn.appium.tests.manager.TestManager;
 import com.bn.appium.tests.utils.ConfigManager;
 import com.bn.appium.tests.utils.ConfigurationParametersEnum;
+import com.bn.appium.tests.utils.MainConstants;
+import com.bn.appium.tests.utils.Timer;
 import io.appium.java_client.AppiumDriver;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
+import net.bugs.testhelper.TestHelper;
+import org.apache.commons.io.FileUtils;
+import org.openqa.selenium.*;
+import org.openqa.selenium.remote.Augmenter;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import java.io.File;
 import java.net.URL;
+import java.util.Date;
 
 public class AndroidKpiTests {
     private AppiumDriver driver;
     private ConfigManager configManager;
+    private TestManager testManager;
+    private TestHelper testHelper;
 
     public void setUp() throws Exception {
         System.out.println("setUp");
+        testManager = TestManager.getInstance();
+        testHelper = testManager.getTestHelper();
         configManager = new ConfigManager();
         File appDir = new File(configManager.getProperty(ConfigurationParametersEnum.ANDROID_APP_DIR.name()));
         File app = new File(appDir, configManager.getProperty(ConfigurationParametersEnum.ANDROID_APP.name()));
@@ -49,35 +59,75 @@ public class AndroidKpiTests {
         return false;
     }
 
-    public void addContact(){
+    public void testOobe() {
+        TestManager.startTimer();
+        MainConstants.TIME_START_TEST = System.currentTimeMillis();
+
         System.out.println("wait LOG IN");
-        if(!waitElement(By.name("United States"), 60000))
+        if (!waitElement(By.name("United States"), Timer.getTimeout())) {
+            TestManager.stopTimer(false);
+            TestManager.write(TestManager.addLogParams(new Date(), MainConstants.Android.Kpi.TestAction.SIGN_IN, Constant.Account.ACCOUNT, false));
+            TestManager.write(TestManager.addLogParams(new Date(), MainConstants.Android.Kpi.TestAction.FULL_SYNC, Constant.Account.ACCOUNT, false));
             return;
+        }
+
         driver.findElement(By.name("LOG IN")).click();
 
-        if(!waitElement(By.name("Email"), 60000))
+        TestManager.startTimer();
+        if (!waitElement(By.name("Email"), Timer.getTimeout())) {
+            TestManager.stopTimer(false);
+            TestManager.write(TestManager.addLogParams(new Date(), MainConstants.Android.Kpi.TestAction.SIGN_IN, Constant.Account.ACCOUNT, false));
+            TestManager.write(TestManager.addLogParams(new Date(), MainConstants.Android.Kpi.TestAction.FULL_SYNC, Constant.Account.ACCOUNT, false));
             return;
+        }
+
         WebElement email = driver.findElement(By.name("Email"));
         email.sendKeys(configManager.getProperty(ConfigurationParametersEnum.LOGIN.name()));
         driver.sendKeyEvent(4);
 
-        if(!waitElement(By.name("Next"), 60000))
+        if (!waitElement(By.name("Next"), Timer.getTimeout())){
+            TestManager.stopTimer(false);
+            TestManager.write(TestManager.addLogParams(new Date(), MainConstants.Android.Kpi.TestAction.SIGN_IN, Constant.Account.ACCOUNT, false));
+            TestManager.write(TestManager.addLogParams(new Date(), MainConstants.Android.Kpi.TestAction.FULL_SYNC, Constant.Account.ACCOUNT, false));
             return;
+        }
+
         driver.findElement(By.name("Next")).click();
 
-//        if(!waitElement(By.name("Password"), 60000))
-//            return;
         sleep(2500);
 
         WebElement password = driver.findElementByClassName("android.widget.EditText");
         password.sendKeys(configManager.getProperty(ConfigurationParametersEnum.PASSWORD.name()));
         driver.sendKeyEvent(4);
 
-        if(!waitElement(By.name("Sign Up"), 60000))
+        if(!waitElement(By.name("Sign Up"), Timer.getTimeout())) {
+            TestManager.stopTimer(false);
+            TestManager.write(TestManager.addLogParams(new Date(), MainConstants.Android.Kpi.TestAction.SIGN_IN, Constant.Account.ACCOUNT, false));
+            TestManager.write(TestManager.addLogParams(new Date(), MainConstants.Android.Kpi.TestAction.FULL_SYNC, Constant.Account.ACCOUNT, false));
             return;
+        }
+
         driver.findElement(By.name("Sign Up")).click();
 
-        sleep(15000);
+        TestManager.startTimer();
+        if(!waitElement(By.id("bn.ereader:id/pager"), Timer.getTimeout())) {
+            TestManager.stopTimer(false);
+            TestManager.write(TestManager.addLogParams(new Date(), MainConstants.Android.Kpi.TestAction.SIGN_IN, Constant.Account.ACCOUNT, false));
+            TestManager.write(TestManager.addLogParams(new Date(), MainConstants.Android.Kpi.TestAction.FULL_SYNC, Constant.Account.ACCOUNT, false));
+            return;
+        }
+
+        TestManager.stopTimer(false);
+        TestManager.write(TestManager.addLogParams(new Date(), MainConstants.Android.Kpi.TestAction.SIGN_IN, Constant.Account.ACCOUNT, true));
+
+        String logcat = TestManager.configManager.getProperty(ConfigurationParametersEnum.SYNC_COMPLETE.name());
+        if (!testHelper.waitForLogcatLineExists(logcat, Timer.getTimeout())) {
+            TestManager.stopTimer(false);
+            TestManager.write(TestManager.addLogParams(new Date(), MainConstants.Android.Kpi.TestAction.FULL_SYNC, Constant.Account.ACCOUNT, false));
+            return;
+        }
+        TestManager.stopTimer(false);
+        TestManager.write(TestManager.addLogParams(new Date(), MainConstants.Android.Kpi.TestAction.FULL_SYNC, Constant.Account.ACCOUNT, true));
     }
 
     private static void sleep(long ms){
@@ -88,4 +138,23 @@ public class AndroidKpiTests {
         }
     }
 
+    public void captureScreenshot(String testName) {
+        new File("target/surefire-reports/screenshot/").mkdirs();
+        String filename = "target/surefire-reports/screenshot/" + testName + ".jpg";
+
+        try {
+            WebDriver augmentedDriver = new Augmenter().augment(driver);
+            File scrFile = ((TakesScreenshot)augmentedDriver).getScreenshotAs(OutputType.FILE);
+            FileUtils.copyFile(scrFile, new File(filename), true);
+        } catch (Exception e) {
+            System.out.println("Error capturing screen shot of " + testName + " test failure.");
+        }
+    }
+
+    public static class Constant{
+        public static class Account{
+            public static String ACCOUNT = "";
+            public static String PASSWORD = "";
+        }
+    }
 }
