@@ -15,7 +15,7 @@ import java.io.File;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 
-public class UICatalogTest {
+public class IOsKpiTests {
     private AppiumDriver driver;
     private WebElement row;
     private ConfigManager configManager;
