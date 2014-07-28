@@ -95,10 +95,9 @@ public class TestManager {
         String mobilePlatform = configManager.getProperty(ConfigurationParametersEnum.MOBILE_PLATFORM.name());
         if(mobilePlatform == null || mobilePlatform.isEmpty())
             return Platform.None;
-        if(mobilePlatform.toUpperCase().equals("android")) {
+        if(mobilePlatform.toLowerCase().equals("android"))
             return Platform.Android;
-        }
-        if(mobilePlatform.toUpperCase().equals("ios"))
+        if(mobilePlatform.toLowerCase().equals("ios"))
             return Platform.iOs;
         return Platform.None;
     }
