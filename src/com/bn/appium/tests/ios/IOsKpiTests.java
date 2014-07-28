@@ -25,7 +25,7 @@ public class IOsKpiTests {
 
     public void setUp() throws Exception {
         configManager = new ConfigManager();
-        launchServer();
+//        launchServer();
         Thread.sleep(5000);
         DesiredCapabilities capabilities = new DesiredCapabilities();
         capabilities.setCapability(CapabilityType.BROWSER_NAME, "");
@@ -44,7 +44,7 @@ public class IOsKpiTests {
         new Thread(new Runnable() {
             public void run() {
                 String[] commands = new String[]{
-                        "appium",
+                        "/usr/local/bin/appium",
                         "-U",
                         configManager.getProperty(ConfigurationParametersEnum.IOS_DEVICE_ID.name())
                 };
@@ -129,7 +129,7 @@ public class IOsKpiTests {
     }
 
     public void login() throws Exception {
-
+        MainConstants.TEST_NAME = MainConstants.Android.testOobe;
         log("start test");
         WebElement signInButton = getWebElement(By.name("signIn"));
         if(signInButton == null) return;

@@ -23,7 +23,7 @@ import static com.bn.appium.tests.utils.LoggerUtils.i;
  */
 public class TestManager {
     private static volatile TestManager instance;
-    private enum Platform {Android, iOs, None};
+    public static enum Platform {Android, iOs, None};
     public static Platform currentPlatform = Platform.None;
 
     private static TestHelper testHelper;
@@ -49,7 +49,7 @@ public class TestManager {
     private TestManager(String buildID, String deviceID, AppiumDriver appiumDriver) {
         driver = appiumDriver;
         configManager = new ConfigManager();
-        currentPlatform = getCurrentPlatform();
+        currentPlatform = getCurrentPlatform(configManager);
         switch (currentPlatform){
             case Android:
                 i("Android platform is selected!");
@@ -91,7 +91,7 @@ public class TestManager {
         return instance;
     }
 
-    public static Platform getCurrentPlatform(){
+    public static Platform getCurrentPlatform(ConfigManager configManager){
         String mobilePlatform = configManager.getProperty(ConfigurationParametersEnum.MOBILE_PLATFORM.name());
         if(mobilePlatform == null || mobilePlatform.isEmpty())
             return Platform.None;
@@ -197,7 +197,6 @@ public class TestManager {
         if(!isStopErrorHandler) return;
         isStopErrorHandler = false;
         new Thread(new Runnable() {
-            @Override
             public void run() {
                 while (!isStopErrorHandler){
                     ArrayList<View> views = testHelper.getAllViews(false);
