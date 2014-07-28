@@ -19,11 +19,9 @@ import java.util.Date;
 
 public class IOsKpiTests {
     private AppiumDriver driver;
-    private WebElement row;
     private ConfigManager configManager;
     private Process process;
     private TestManager testManager;
-    private TestHelper testHelper;
 
     public void setUp() throws Exception {
         configManager = new ConfigManager();
@@ -40,7 +38,6 @@ public class IOsKpiTests {
         MainConstants.TIME_START_TEST = System.currentTimeMillis();
         MainConstants.FILE_NAME_LOG_TESTS = "iOs.csv";
         testManager = TestManager.getInstance(driver);
-        testHelper = testManager.getTestHelper();
     }
 
     private void launchServer() {
@@ -96,51 +93,74 @@ public class IOsKpiTests {
         WebElement webElement;
         webElement = getWebElement(By.name("com.bn hub hamburger menu"));
         if(webElement == null)  return;
+        log("click \"com.bn hub hamburger menu\" button");
         webElement.click();
         sleep(2000);
 
         webElement = getWebElement(By.name("SETTINGS"));
+        if(webElement == null) return;
+        log("click \"SETTINGS\" button");
         webElement.click();
         sleep(2000);
 
         webElement = getWebElement(By.name("Logout"));
+        if(webElement == null) return;
+        log("click \"Logout\" button");
         webElement.click();
         sleep(2000);
 
         webElement = getWebElement(By.name("OK"));
+        if(webElement == null) return;
+        log("click \"OK\" button");
         webElement.click();
 
-        WebElement signInButton = getWebElement(By.name("signIn"));
-        while (signInButton == null) {
-            sleep(1000);
-            signInButton = getWebElement(By.name("signIn"));
-        }
+        sleep(10000);
+
+//        long start = System.currentTimeMillis();
+//        WebElement signInButton = getWebElement(By.name("signIn"));
+//        while (signInButton == null) {
+//            if(System.currentTimeMillis() - start > 1000) {
+//                log("wait for \"signIn\" button");
+//                start = System.currentTimeMillis();
+//            }
+//            sleep(1000);
+//            signInButton = getWebElement(By.name("signIn"));
+//        }
     }
 
     public void login() throws Exception {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss:SSS");
-        System.out.println(simpleDateFormat.format(System.currentTimeMillis()) + " start test");
+
+        log("start test");
         WebElement signInButton = getWebElement(By.name("signIn"));
         if(signInButton == null) return;
 
         if(signInButton.isDisplayed()) {
-            System.out.println(simpleDateFormat.format(System.currentTimeMillis()) + " Click");
+            log("click sign in button");
             signInButton.click();
         }
         Thread.sleep(2000);
 
         WebElement editText = getWebElement(By.className("UIATextField"));
-        editText.sendKeys("8494076_qa@books.com");
+        log("input login: " + configManager.getProperty(ConfigurationParametersEnum.LOGIN.name()));
+        editText.sendKeys(configManager.getProperty(ConfigurationParametersEnum.LOGIN.name()));
 
         WebElement secureEditText = getWebElement(By.className("UIASecureTextField"));
-        secureEditText.sendKeys("access\n");
+        log("input pasword: *****");
+        secureEditText.sendKeys(configManager.getProperty(ConfigurationParametersEnum.PASSWORD.name()) + "\n");
+        log("press sign in");
 
         TestManager.startTimer();
 
         WebElement webElement = getWebElement(By.name("Free Sample"));
 
+        long startTime = System.currentTimeMillis();
         while (true) {
+            if(System.currentTimeMillis() - startTime > 1000) {
+                log("wait for \"Free Sample\" button");
+                startTime = System.currentTimeMillis();
+            }
             if(Timer.getTimeout() <= 0) {
+                log("\"Free Sample\" button is not found");
                 TestManager.write(TestManager.addLogParams(new Date(), MainConstants.Android.Kpi.TestAction.SIGN_IN, AndroidKpiTests.Constant.Account.ACCOUNT, false));
                 return;
             }
@@ -160,13 +180,18 @@ public class IOsKpiTests {
             webElement = null;
         }
 
-        while (webElement != null) {
-            System.out.println(simpleDateFormat.format(System.currentTimeMillis()) + " wait for signed in");
-            try {
-                webElement = getWebElement(By.name("Network connection in progress"));
-            } catch (Exception ex) {
-                webElement = null;
-            }
-        }
+//        while (webElement != null) {
+//            log("wait for signed in");
+//            try {
+//                webElement = getWebElement(By.name("Network connection in progress"));
+//            } catch (Exception ex) {
+//                webElement = null;
+//            }
+//        }
+    }
+
+    private void log(String message) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss:SSS");
+        System.out.println(simpleDateFormat.format(System.currentTimeMillis()) + " " + message);
     }
 }

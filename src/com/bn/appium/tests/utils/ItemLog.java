@@ -277,8 +277,10 @@ public class ItemLog {
         else
             this.totalTime = this.endTime - this.startTime;
 
-        testHelper.i("Total time:" + (this.endTime - this.startTime));
-        testHelper.i("Accuracy total time:" + (this.endTime - this.startTime - accuracy/2));
+        if(testHelper != null) {
+            testHelper.i("Total time:" + (this.endTime - this.startTime));
+            testHelper.i("Accuracy total time:" + (this.endTime - this.startTime - accuracy / 2));
+        }
     }
 
     public void setTestResult(boolean testResult) {

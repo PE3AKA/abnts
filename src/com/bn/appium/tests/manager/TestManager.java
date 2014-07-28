@@ -117,12 +117,12 @@ public class TestManager {
 
     public static ItemLog addLogParams(Date date, String testAction, String testData, boolean testResult){
         ItemLog itemLog = new ItemLog(testHelper);
-        itemLog.setBuild(mDevice.build);
-        itemLog.setDeviceId(mDevice.deviceId);
-        itemLog.setNet(mDevice.network);
-        itemLog.setHw(mDevice.hwDevice);
-        itemLog.setOs(mDevice.osDevice);
-        itemLog.setSlaveId(mDevice.os_system);
+        itemLog.setBuild(mDeviceId != null ? mDevice.build : "");
+        itemLog.setDeviceId(mDeviceId != null ? mDevice.deviceId : "");
+        itemLog.setNet(mDeviceId != null ? mDevice.network : "");
+        itemLog.setHw(mDeviceId != null ? mDevice.hwDevice : "");
+        itemLog.setOs(mDeviceId != null ? mDevice.osDevice : "");
+        itemLog.setSlaveId(mDeviceId != null ? mDevice.os_system : "");
         itemLog.setDate(date, "");
         itemLog.setTime(date, "");
         itemLog.setStartTime(mStartTime);
@@ -137,7 +137,8 @@ public class TestManager {
     private void setupItemsName() {
         File file = new File(MainConstants.PATH_TO_ITEMS_NAME);
         if(!file.exists()) {
-            testHelper.i("file doesn't exist");
+            if(testHelper != null)
+                testHelper.i("file doesn't exist");
             return;
         }
         FileReader fileReader = null;
@@ -183,7 +184,8 @@ public class TestManager {
     }
 
     public static Date write(String text){
-        testHelper.i(">>>>>>>>>>>>>>> TEST STEP: " + text);
+        if(testHelper != null)
+            testHelper.i(">>>>>>>>>>>>>>> TEST STEP: " + text);
         return fileWorker.write(text);
     }
 
@@ -254,13 +256,15 @@ public class TestManager {
 
     private static void timer(boolean isStart){
         long time = System.currentTimeMillis();
-        testHelper.i(String.format ((isStart ? "timer started at %s" : "timer stopped at %s, total time: %s"), testHelper.getStringFromDate(new Date(time), "HH:mm:ss.SSS") + "", (time - mStartTime) + ""));
+        if(testHelper != null)
+            testHelper.i(String.format ((isStart ? "timer started at %s" : "timer stopped at %s, total time: %s"), testHelper.getStringFromDate(new Date(time), "HH:mm:ss.SSS") + "", (time - mStartTime) + ""));
         if(isStart)
             mStartTime = time;
         else{
             if(isAccuracy){
                 mLastDumpTime = testHelper.getLastDumpTotalTime();
-                testHelper.i("Time dump: " + mLastDumpTime);
+                if(testHelper != null)
+                    testHelper.i("Time dump: " + mLastDumpTime);
             }
             mEndTime = time;
         }
