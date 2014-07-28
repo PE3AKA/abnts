@@ -1,6 +1,5 @@
 package com.bn.appium.tests;
 
-import com.bn.appium.tests.android.AndroidKpiTests;
 import com.bn.appium.tests.ios.IOsKpiTests;
 
 /**

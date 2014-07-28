@@ -1,14 +1,6 @@
 package com.bn.appium.tests.utils;
 
 import com.bn.appium.tests.manager.TestManager;
-import io.appium.java_client.AppiumDriver;
-import net.bugs.testhelper.TestHelper;
-import org.apache.commons.io.FileUtils;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.TakesScreenshot;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.remote.Augmenter;
-
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -20,16 +12,13 @@ public class FileWorker {
     private String fileName;
     private File currentFile;
     private String testName = null;
-    private TestHelper testHelper;
 
-    public FileWorker(String fileName, TestHelper testHelper) {
+    public FileWorker(String fileName) {
         this.fileName = fileName;
-        this.testHelper = testHelper;
     }
 
-    public FileWorker(TestHelper testHelper) {
+    public FileWorker() {
         this.fileName = MainConstants.FILE_NAME_RANDOM_TESTS;
-        this.testHelper = testHelper;
     }
 
     public void setTestName(String testName) {
@@ -37,7 +26,6 @@ public class FileWorker {
     }
 
     public void writeLog(ItemLog itemLog){
-        testHelper.i("write kpi event");
         BufferedWriter bw = null;
         currentFile = new File(fileName);
         try {
@@ -62,7 +50,7 @@ public class FileWorker {
         }
         String name = itemLog.getDate() + "_" + itemLog.getTime() + "_" + (itemLog.getTestResult() ? "pass" : "fail") +
                 "_" + itemLog.getTestName() + "_" + itemLog.getTestAction();
-        testHelper.sleep(MainConstants.SCREENSHOT_TIMEOUT);
+        TestManager.sleep(MainConstants.SCREENSHOT_TIMEOUT);
         TestManager.captureScreenshot(name);
     }
 

@@ -1,5 +1,6 @@
 package com.bn.appium.tests.manager;
 
+import com.bn.appium.tests.exception.AppiumPlatformException;
 import com.bn.appium.tests.utils.*;
 import io.appium.java_client.AppiumDriver;
 import net.bugs.testhelper.TestHelper;
@@ -15,11 +16,16 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Random;
 
+import static com.bn.appium.tests.utils.LoggerUtils.i;
+
 /**
  * Created by nikolai on 10.01.14.
  */
 public class TestManager {
     private static volatile TestManager instance;
+    private enum Platform {Android, iOs, None};
+    public static Platform currentPlatform = Platform.None;
+
     private static TestHelper testHelper;
     private static FileWorker fileWorker;
     private static FileWorker fileLogWorker;
@@ -37,20 +43,36 @@ public class TestManager {
     public static Device mDevice;
     private static long mStartTime = 0;
     private static long mEndTime = 0;
-    private static boolean mTestResult = false;
     public static ConfigManager configManager = null;
     private static AppiumDriver driver;
 
     private TestManager(String buildID, String deviceID, AppiumDriver appiumDriver) {
         driver = appiumDriver;
         configManager = new ConfigManager();
-        testHelper = new TestHelper(deviceID);
-        mDevice = new Device(testHelper, buildID);
-        mDevice.setHwDevice(mHwDevice);
-        mDevice.setTimeout(mArgTimeout);
-        mTimeout = mDevice.timeout;
-        fileWorker = new FileWorker(testHelper);
-        fileLogWorker = new FileWorker(MainConstants.FILE_NAME_LOG_TESTS, testHelper);
+        currentPlatform = getCurrentPlatform();
+        switch (currentPlatform){
+            case Android:
+                i("Android platform is selected!");
+                testHelper = new TestHelper(deviceID);
+                mDevice = new Device(testHelper, buildID);
+                mDevice.setHwDevice(mHwDevice);
+                mDevice.setTimeout(mArgTimeout);
+                break;
+            case iOs:
+                i("iOs platform is selected!");
+                break;
+            case None:
+                try {
+                    throw new AppiumPlatformException("Please, specify the value of the MOBILE_PLATFORM!");
+                } catch (AppiumPlatformException e) {
+                    e.printStackTrace();
+                }
+                break;
+        }
+
+        mTimeout = configManager.getTimeout();
+        fileWorker = new FileWorker();
+        fileLogWorker = new FileWorker(MainConstants.FILE_NAME_LOG_TESTS);
     }
 
     public static TestManager getInstance(final String buildId, final String login, final String password,
@@ -67,6 +89,18 @@ public class TestManager {
                     instance = new TestManager(mBuildId, mDeviceId, driver);
             }
         return instance;
+    }
+
+    public static Platform getCurrentPlatform(){
+        String mobilePlatform = configManager.getProperty(ConfigurationParametersEnum.MOBILE_PLATFORM.name());
+        if(mobilePlatform == null || mobilePlatform.isEmpty())
+            return Platform.None;
+        if(mobilePlatform.toUpperCase().equals("android")) {
+            return Platform.Android;
+        }
+        if(mobilePlatform.toUpperCase().equals("ios"))
+            return Platform.iOs;
+        return Platform.None;
     }
 
     public static TestManager getInstance(AppiumDriver driver){
@@ -243,12 +277,17 @@ public class TestManager {
         timer(false);
     }
 
+    public static void sleep(long ms){
+        try {
+            Thread.sleep(ms);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Deprecated
     public static void stopTimer(){
         timer(false);
     }
 
-    public static void testResult(boolean testResult){
-        mTestResult = testResult;
-    }
 }

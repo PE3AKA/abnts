@@ -4,6 +4,8 @@ package com.bn.appium.tests.utils;
  * Created by avsupport on 3/5/14.
  */
 public enum ConfigurationParametersEnum {
+    MOBILE_PLATFORM,
+
     ANDROID_APP_DIR,
     ANDROID_APP,
     ANDROID_PLATFORM_VERSION,
