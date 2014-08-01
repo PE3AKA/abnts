@@ -31,8 +31,10 @@ public class IOsKpiTests {
         capabilities.setCapability(CapabilityType.BROWSER_NAME, "");
         capabilities.setCapability("platformVersion", configManager.getProperty(ConfigurationParametersEnum.IOS_PLATFORM_VERSION.name()));
         capabilities.setCapability("platformName", configManager.getProperty(ConfigurationParametersEnum.IOS_PLATFORM_NAME.name()));
-        capabilities.setCapability("deviceName", configManager.getProperty(ConfigurationParametersEnum.IOS_DEVICE_ID.name()));
-        capabilities.setCapability("U", configManager.getProperty(ConfigurationParametersEnum.IOS_DEVICE_ID.name()));
+        capabilities.setCapability("deviceName", configManager.getProperty(ConfigurationParametersEnum.IOS_DEVICE.name()));
+//        capabilities.setCapability("device", configManager.getProperty(ConfigurationParametersEnum.IOS_DEVICE.name()));
+//        capabilities.setCapability("bundleid", configManager.getProperty(ConfigurationParametersEnum.IOS_DEVICE_ID.name()));
+        capabilities.setCapability("udid", configManager.getProperty(ConfigurationParametersEnum.IOS_DEVICE_ID.name()));
         capabilities.setCapability("app", configManager.getProperty(ConfigurationParametersEnum.IOS_APP_PACKAGE.name()));
         driver = new AppiumDriver(new URL("http://127.0.0.1:4723/wd/hub"), capabilities);
         MainConstants.TIME_START_TEST = System.currentTimeMillis();

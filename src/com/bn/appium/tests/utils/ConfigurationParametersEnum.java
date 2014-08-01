@@ -20,6 +20,7 @@ public enum ConfigurationParametersEnum {
     IOS_PLATFORM_NAME,
     IOS_APP_PACKAGE,
     IOS_DEVICE_ID,
+    IOS_DEVICE,
 
     LOGIN,
     PASSWORD,

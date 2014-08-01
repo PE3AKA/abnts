@@ -110,7 +110,7 @@ public class AndroidKpiTests {
         driver.findElement(By.name("Sign Up")).click();
 
         TestManager.startTimer();
-        if(!waitElement(By.id("bn.ereader:id/pager"), Timer.getTimeout())) {
+        if(!waitElement(By.name("Allow"), Timer.getTimeout())) {
             TestManager.stopTimer(false);
             TestManager.write(TestManager.addLogParams(new Date(), MainConstants.Android.Kpi.TestAction.SIGN_IN, Constant.Account.ACCOUNT, false));
             TestManager.write(TestManager.addLogParams(new Date(), MainConstants.Android.Kpi.TestAction.FULL_SYNC, Constant.Account.ACCOUNT, false));
@@ -119,6 +119,8 @@ public class AndroidKpiTests {
 
         TestManager.stopTimer(false);
         TestManager.write(TestManager.addLogParams(new Date(), MainConstants.Android.Kpi.TestAction.SIGN_IN, Constant.Account.ACCOUNT, true));
+
+        driver.findElementByName("Allow").click();
 
         String logcat = TestManager.configManager.getProperty(ConfigurationParametersEnum.SYNC_COMPLETE.name());
         if (!testHelper.waitForLogcatLineExists(logcat, Timer.getTimeout())) {
