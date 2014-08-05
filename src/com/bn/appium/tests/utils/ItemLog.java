@@ -212,7 +212,7 @@ public class ItemLog {
             simpleTimeFormat = new SimpleDateFormat(format);
             this.time = simpleTimeFormat.format(t);
         }else{
-            simpleTimeFormat = new SimpleDateFormat("HH:mm:ss.SSS");
+            simpleTimeFormat = new SimpleDateFormat("HH.mm.ss.SSS");
             this.time = simpleTimeFormat.format(t);
         }
     }

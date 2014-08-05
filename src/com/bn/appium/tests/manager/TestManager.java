@@ -114,7 +114,6 @@ public class TestManager {
         testHelper.executeShellCommand(" am start -n " + intent, testHelper.defaultCallBack);
     }
 
-
     public static ItemLog addLogParams(Date date, String testAction, String testData, boolean testResult){
         ItemLog itemLog = new ItemLog(testHelper);
         itemLog.setBuild(mDeviceId != null ? mDevice.build : "");
@@ -227,18 +226,26 @@ public class TestManager {
         isStopErrorHandler = true;
     }
 
-
     public static void captureScreenshot(String testName) {
-        new File("target/surefire-reports/screenshot/").mkdirs();
-        String filename = "target/surefire-reports/screenshot/" + testName + ".jpg";
+        new File("target/screenshots/").mkdirs();
+        String filename = "target/screenshots/" + testName + ".png";
 
+        i("Filename: " + filename);
+        File scrFile = driver.getScreenshotAs(OutputType.FILE);
         try {
-            WebDriver augmentedDriver = new Augmenter().augment(driver);
-            File scrFile = ((TakesScreenshot)augmentedDriver).getScreenshotAs(OutputType.FILE);
-            FileUtils.copyFile(scrFile, new File(filename), true);
-        } catch (Exception e) {
+            FileUtils.copyFile(scrFile, new File(filename));
+        } catch (IOException e) {
             System.out.println("Error capturing screen shot of " + testName + " test failure.");
+            e.printStackTrace();
         }
+
+//        try {
+//            WebDriver augmentedDriver = new Augmenter().augment(driver);
+//            File scrFile = ((TakesScreenshot)augmentedDriver).getScreenshotAs(OutputType.FILE);
+//            FileUtils.copyFile(scrFile, new File(filename), true);
+//        } catch (Exception e) {
+//            System.out.println("Error capturing screen shot of " + testName + " test failure.");
+//        }
     }
 
     public static class Errors {

@@ -5,9 +5,6 @@ import com.bn.appium.tests.ios.IOsKpiTests;
 import com.bn.appium.tests.manager.TestManager;
 import com.bn.appium.tests.utils.ConfigManager;
 
-import static com.bn.appium.tests.manager.TestManager.Platform.Android;
-import static com.bn.appium.tests.manager.TestManager.Platform.iOs;
-
 /**
  * Created by nikolai on 25.07.2014.
  */
@@ -39,5 +36,4 @@ public class Main {
                 break;
         }
     }
-
 }
