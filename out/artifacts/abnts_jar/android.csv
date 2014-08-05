@@ -1,2 +1,0 @@
-Date=01.08.2014, Time=10:10:28.283, Build=, HW=, OS=, Net=, DeviceID=, SlaveID=, TestType=kpi, TestID=AlchemyKpi, TestName=, TestAction=Sign_In, TestData=, UsedMemory=, StartTime=1406877026048, EndTime=1406877028282, TotalTime=2234, TestResult=pass, TestCycle=
-Date=01.08.2014, Time=10:10:38.733, Build=, HW=, OS=, Net=, DeviceID=, SlaveID=, TestType=kpi, TestID=AlchemyKpi, TestName=, TestAction=FullSync, TestData=, UsedMemory=, StartTime=1406877026048, EndTime=1406877038730, TotalTime=12682, TestResult=pass, TestCycle=
