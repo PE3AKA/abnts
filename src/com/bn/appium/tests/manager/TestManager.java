@@ -76,7 +76,8 @@ public class TestManager {
     }
 
     public static TestManager getInstance(final String buildId, final String login, final String password,
-                                          final String deviceId, final String hwDevice, final String timeout, AppiumDriver driver){
+                                          final String deviceId, final String hwDevice, final String timeout,
+                                          AppiumDriver driver){
         mArgTimeout = timeout;
         mDeviceId = deviceId;
         mHwDevice = hwDevice;

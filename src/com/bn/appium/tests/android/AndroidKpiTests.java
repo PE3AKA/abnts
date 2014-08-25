@@ -71,6 +71,7 @@ public class AndroidKpiTests {
             return;
         }
 
+        TestManager.captureScreenshot("login");
         driver.findElement(By.name("LOG IN")).click();
 
         TestManager.startTimer();
@@ -83,8 +84,9 @@ public class AndroidKpiTests {
 
         WebElement email = driver.findElement(By.name("Email"));
         email.sendKeys(configManager.getProperty(ConfigurationParametersEnum.LOGIN.name()));
-        driver.sendKeyEvent(4);
+//        driver.sendKeyEvent(4);
 
+        TestManager.captureScreenshot("email");
         if (!waitElement(By.name("Next"), Timer.getTimeout())){
             TestManager.stopTimer(false);
             TestManager.write(TestManager.addLogParams(new Date(), MainConstants.Android.Kpi.TestAction.SIGN_IN, Constant.Account.ACCOUNT, false));
@@ -92,22 +94,21 @@ public class AndroidKpiTests {
             return;
         }
 
-        driver.findElement(By.name("Next")).click();
+        driver.findElement(By.id("bn.ereader:id/next")).click();
 
-        sleep(2500);
-
-        WebElement password = driver.findElementByClassName("android.widget.EditText");
-        password.sendKeys(configManager.getProperty(ConfigurationParametersEnum.PASSWORD.name()));
-        driver.sendKeyEvent(4);
-
-        if(!waitElement(By.name("Sign Up"), Timer.getTimeout())) {
+        if(!waitElement(By.id("bn.ereader:id/sign_in"), Timer.getTimeout())) {
             TestManager.stopTimer(false);
             TestManager.write(TestManager.addLogParams(new Date(), MainConstants.Android.Kpi.TestAction.SIGN_IN, Constant.Account.ACCOUNT, false));
             TestManager.write(TestManager.addLogParams(new Date(), MainConstants.Android.Kpi.TestAction.FULL_SYNC, Constant.Account.ACCOUNT, false));
             return;
         }
 
-        driver.findElement(By.name("Sign Up")).click();
+        WebElement password = driver.findElementByClassName("android.widget.EditText");
+        password.sendKeys(configManager.getProperty(ConfigurationParametersEnum.PASSWORD.name()));
+//        driver.sendKeyEvent(4);
+
+        TestManager.captureScreenshot("sign_in");
+        driver.findElement(By.id("bn.ereader:id/sign_in")).click();
 
         TestManager.startTimer();
         if(!waitElement(By.name("Allow"), Timer.getTimeout())) {
